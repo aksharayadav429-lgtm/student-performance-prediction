@@ -4,41 +4,30 @@ from pydantic import BaseModel
 import joblib
 import pandas as pd
 
-# ==========================================
-# CREATE FASTAPI APP
-# ==========================================
-
 app = FastAPI(
     title="Student Performance Prediction API",
     description="Machine Learning API for predicting student final marks",
     version="1.0"
 )
 
-# ==========================================
-# ENABLE CORS
-# ==========================================
-
+# CORS settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:5500",
-        "http://localhost:5500"
+        "http://localhost:5500",
+        "https://student-performance-prediction-j9p2.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ==========================================
-# LOAD ML MODEL
-# ==========================================
-
+# Load trained model
 model = joblib.load("model/student_model.pkl")
 
-# ==========================================
-# INPUT DATA MODEL
-# ==========================================
 
+# Input data model
 class StudentData(BaseModel):
     study_hours: float
     attendance: float
@@ -50,20 +39,16 @@ class StudentData(BaseModel):
     extracurricular: int
     backlogs: int
 
-# ==========================================
-# HOME ROUTE
-# ==========================================
 
+# Home route
 @app.get("/")
 def home():
     return {
         "message": "Student Performance Prediction API is running!"
     }
 
-# ==========================================
-# PREDICTION ROUTE
-# ==========================================
 
+# Prediction route
 @app.post("/predict")
 def predict(student: StudentData):
 
@@ -79,8 +64,10 @@ def predict(student: StudentData):
         "backlogs": student.backlogs
     }])
 
+    # Make prediction
     prediction = model.predict(input_data)[0]
 
+    # Categorize performance
     if prediction >= 85:
         category = "Excellent"
     elif prediction >= 70:
