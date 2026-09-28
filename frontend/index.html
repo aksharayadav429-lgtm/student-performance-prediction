@@ -1,0 +1,600 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Student Performance Prediction
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <h1>
+        🎓 Student Performance Prediction
+    </h1>
+
+    <p class="subtitle">
+        Enter student details to predict final marks
+        using Machine Learning.
+    </p>
+
+
+    <!-- ==========================================
+         PREDICTION FORM
+    =========================================== -->
+
+    <form id="predictionForm">
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label>
+                    📚 Study Hours per Day
+                </label>
+
+                <input
+                    type="number"
+                    id="study_hours"
+                    min="0"
+                    max="24"
+                    step="0.1"
+                    placeholder="Example: 6"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📅 Attendance (%)
+                </label>
+
+                <input
+                    type="number"
+                    id="attendance"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Example: 88"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📖 Previous Marks
+                </label>
+
+                <input
+                    type="number"
+                    id="previous_marks"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Example: 78"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📝 Assignment Score
+                </label>
+
+                <input
+                    type="number"
+                    id="assignment_score"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Example: 84"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📊 Internal Marks
+                </label>
+
+                <input
+                    type="number"
+                    id="internal_marks"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Example: 80"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    😴 Sleep Hours per Day
+                </label>
+
+                <input
+                    type="number"
+                    id="sleep_hours"
+                    min="0"
+                    max="24"
+                    step="0.1"
+                    placeholder="Example: 8"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    🌐 Internet Hours per Day
+                </label>
+
+                <input
+                    type="number"
+                    id="internet_hours"
+                    min="0"
+                    max="24"
+                    step="0.1"
+                    placeholder="Example: 2"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    🏆 Extracurricular Activity
+                </label>
+
+                <select
+                    id="extracurricular"
+                    required
+                >
+
+                    <option value="">
+                        Select
+                    </option>
+
+                    <option value="1">
+                        Yes
+                    </option>
+
+                    <option value="0">
+                        No
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📕 Number of Backlogs
+                </label>
+
+                <input
+                    type="number"
+                    id="backlogs"
+                    min="0"
+                    max="20"
+                    placeholder="Example: 0"
+                    required
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             BUTTONS
+        =========================================== -->
+
+        <button type="submit">
+
+            🚀 Predict Performance
+
+        </button>
+
+
+        <button
+            type="button"
+            id="resetButton"
+            class="reset-button"
+        >
+
+            🔄 Reset Form
+
+        </button>
+
+    </form>
+
+
+    <!-- ==========================================
+         LOADING
+    =========================================== -->
+
+    <div
+        id="loading"
+        class="loading hidden"
+    >
+
+        🤖 Analyzing student performance...
+
+    </div>
+
+
+    <!-- ==========================================
+         RESULT
+    =========================================== -->
+
+    <div
+        id="result"
+        class="result hidden"
+    >
+
+        <h2>
+            🎯 Prediction Result
+        </h2>
+
+
+        <div class="score-circle">
+
+            <span id="predictedMarks">
+                0
+            </span>
+
+            <small>
+                / 100
+            </small>
+
+        </div>
+
+
+        <p class="category-text">
+
+            Performance Category
+
+        </p>
+
+
+        <div
+            id="categoryBadge"
+            class="category-badge"
+        >
+
+            -
+
+        </div>
+
+
+        <div class="progress-container">
+
+            <div
+                id="progressBar"
+                class="progress-bar"
+            ></div>
+
+        </div>
+
+
+        <p
+            class="score-message"
+            id="scoreMessage"
+        >
+
+            Your predicted performance
+            is shown above.
+
+        </p>
+
+    </div>
+
+
+    <!-- ==========================================
+         PERFORMANCE ANALYSIS
+    =========================================== -->
+
+    <div
+        id="analysisSection"
+        class="analysis-section hidden"
+    >
+
+        <h2>
+            📊 Performance Analysis
+        </h2>
+
+        <p class="analysis-subtitle">
+
+            Overview of the student's input factors
+
+        </p>
+
+
+        <div class="analysis-chart">
+
+
+            <!-- Study Hours -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+                    📚 Study Hours
+                </div>
+
+                <div class="chart-track">
+
+                    <div
+                        id="studyBar"
+                        class="chart-bar"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="studyValue"
+                    class="chart-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- Attendance -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+                    📅 Attendance
+                </div>
+
+                <div class="chart-track">
+
+                    <div
+                        id="attendanceBar"
+                        class="chart-bar"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="attendanceValue"
+                    class="chart-value"
+                >
+                    0%
+                </div>
+
+            </div>
+
+
+            <!-- Previous Marks -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+                    📖 Previous Marks
+                </div>
+
+                <div class="chart-track">
+
+                    <div
+                        id="previousMarksBar"
+                        class="chart-bar"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="previousMarksValue"
+                    class="chart-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- Assignment -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+                    📝 Assignment
+                </div>
+
+                <div class="chart-track">
+
+                    <div
+                        id="assignmentBar"
+                        class="chart-bar"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="assignmentValue"
+                    class="chart-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- Internal Marks -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+                    📊 Internal Marks
+                </div>
+
+                <div class="chart-track">
+
+                    <div
+                        id="internalBar"
+                        class="chart-bar"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="internalValue"
+                    class="chart-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- Sleep Hours -->
+
+            <div class="chart-row">
+
+                <div class="chart-label">
+                    😴 Sleep Hours
+                </div>
+
+                <div class="chart-track">
+
+                    <div
+                        id="sleepBar"
+                        class="chart-bar"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="sleepValue"
+                    class="chart-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         PREDICTION HISTORY
+    =========================================== -->
+
+    <div class="history-section">
+
+        <h2>
+            📋 Prediction History
+        </h2>
+
+        <p class="history-subtitle">
+
+            Previous student performance predictions
+
+        </p>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Study Hours</th>
+
+                        <th>Attendance</th>
+
+                        <th>Predicted Marks</th>
+
+                        <th>Category</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="historyBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="clearHistoryButton"
+            class="clear-history-button"
+        >
+
+            🗑️ Clear History
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
+

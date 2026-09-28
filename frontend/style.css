@@ -1,0 +1,474 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.97);
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================
+   HEADING
+========================= */
+
+h1 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 35px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #4a4a68;
+}
+
+input,
+select {
+    padding: 14px;
+    border: 2px solid #e0e0f0;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    background: #fafaff;
+    transition: 0.3s;
+}
+
+input:focus,
+select:focus {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    width: 100%;
+    margin-top: 32px;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(102, 126, 234, 0.45);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.reset-button {
+    margin-top: 12px;
+    background: linear-gradient(90deg, #64748b, #475569);
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+    text-align: center;
+    margin-top: 25px;
+    font-weight: bold;
+    color: #667eea;
+    font-size: 17px;
+}
+
+/* =========================
+   RESULT
+========================= */
+
+.result {
+    margin-top: 30px;
+    padding: 30px;
+    border-radius: 18px;
+    text-align: center;
+    background: linear-gradient(
+        135deg,
+        #e0f2fe,
+        #ede9fe,
+        #fce7f3
+    );
+    border: 2px solid #ddd6fe;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.result h2 {
+    margin-bottom: 18px;
+    color: #5b21b6;
+    font-size: 25px;
+}
+
+/* =========================
+   SCORE CIRCLE
+========================= */
+
+.score-circle {
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
+}
+
+.score-circle span {
+    font-size: 38px;
+    font-weight: bold;
+}
+
+.score-circle small {
+    font-size: 18px;
+    margin-left: 3px;
+}
+
+/* =========================
+   CATEGORY
+========================= */
+
+.category-text {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #555;
+}
+
+.category-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #ddd;
+}
+
+.category-badge.excellent {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.category-badge.good {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.category-badge.average {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.category-badge.risk {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* =========================
+   RESULT PROGRESS BAR
+========================= */
+
+.progress-container {
+    width: 100%;
+    height: 14px;
+    margin-top: 25px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    background: linear-gradient(
+        90deg,
+        #667eea,
+        #764ba2,
+        #f093fb
+    );
+    transition: width 1s ease;
+}
+
+.score-message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #555;
+}
+
+/* =========================
+   PERFORMANCE ANALYSIS
+========================= */
+
+.analysis-section {
+    margin-top: 35px;
+    padding: 30px;
+    border-radius: 18px;
+    background: linear-gradient(
+        135deg,
+        #fdf4ff,
+        #eef2ff
+    );
+    border: 2px solid #e9d5ff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+.analysis-section h2 {
+    text-align: center;
+    color: #5b21b6;
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.analysis-subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 28px;
+}
+
+.analysis-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: 150px 1fr 75px;
+    align-items: center;
+    gap: 12px;
+}
+
+.chart-label {
+    font-weight: bold;
+    color: #4a4a68;
+    font-size: 14px;
+}
+
+.chart-track {
+    height: 18px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.chart-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    background: linear-gradient(
+        90deg,
+        #667eea,
+        #764ba2,
+        #f093fb
+    );
+    transition: width 1s ease;
+}
+
+.chart-value {
+    font-weight: bold;
+    color: #5b21b6;
+    text-align: right;
+}
+
+/* =========================
+   PREDICTION HISTORY
+========================= */
+
+.history-section {
+    margin-top: 45px;
+    padding-top: 30px;
+    border-top: 2px solid #eee;
+}
+
+.history-section h2 {
+    text-align: center;
+    color: #5b21b6;
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.history-subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    min-width: 600px;
+}
+
+thead {
+    background: linear-gradient(
+        90deg,
+        #667eea,
+        #764ba2
+    );
+    color: white;
+}
+
+th {
+    padding: 15px;
+    text-align: center;
+    font-size: 15px;
+}
+
+td {
+    padding: 14px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+tbody tr:hover {
+    background: #f5f3ff;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.history-category {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+/* =========================
+   CLEAR HISTORY
+========================= */
+
+.clear-history-button {
+    margin-top: 20px;
+    background: linear-gradient(
+        90deg,
+        #ef4444,
+        #dc2626
+    );
+}
+
+.clear-history-button:hover {
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+}
+
+/* =========================
+   HIDDEN
+========================= */
+
+.hidden {
+    display: none;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 20px 10px;
+    }
+
+    .container {
+        padding: 25px 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .score-circle {
+        width: 130px;
+        height: 130px;
+    }
+
+    .score-circle span {
+        font-size: 32px;
+    }
+
+    .chart-row {
+        grid-template-columns: 1fr;
+        gap: 7px;
+    }
+
+    .chart-value {
+        text-align: left;
+    }
+}
