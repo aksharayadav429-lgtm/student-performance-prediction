@@ -1,106 +1,237 @@
 
 const form = document.getElementById("predictionForm");
+const resultSection = document.getElementById("resultSection");
+const loadingSection = document.getElementById("loadingSection");
 
-const loading = document.getElementById("loading");
+const predictedMarks = document.getElementById("predictedMarks");
+const categoryBadge = document.getElementById("categoryBadge");
+const resultMessage = document.getElementById("resultMessage");
+const scoreProgress = document.getElementById("scoreProgress");
 
-const result = document.getElementById("result");
-
-const predictedMarks =
-    document.getElementById("predictedMarks");
-
-const categoryBadge =
-    document.getElementById("categoryBadge");
-
-const progressBar =
-    document.getElementById("progressBar");
-
-const scoreMessage =
-    document.getElementById("scoreMessage");
-
-const resetButton =
-    document.getElementById("resetButton");
-
-const historyBody =
-    document.getElementById("historyBody");
-
-const clearHistoryButton =
-    document.getElementById("clearHistoryButton");
+const historyBody = document.getElementById("historyBody");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+const resetBtn = document.getElementById("resetBtn");
 
 
-// ==========================================
-// PERFORMANCE ANALYSIS ELEMENTS
-// ==========================================
+// ===============================
+// FORM SUBMISSION
+// ===============================
 
-const analysisSection =
-    document.getElementById("analysisSection");
+form.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-const studyBar =
-    document.getElementById("studyBar");
+    loadingSection.style.display = "block";
+    resultSection.style.display = "none";
 
-const attendanceBar =
-    document.getElementById("attendanceBar");
+    const studentData = {
+        study_hours: parseFloat(document.getElementById("study_hours").value),
+        attendance: parseFloat(document.getElementById("attendance").value),
+        previous_marks: parseFloat(document.getElementById("previous_marks").value),
+        assignment_score: parseFloat(document.getElementById("assignment_score").value),
+        internal_marks: parseFloat(document.getElementById("internal_marks").value),
+        sleep_hours: parseFloat(document.getElementById("sleep_hours").value),
+        internet_hours: parseFloat(document.getElementById("internet_hours").value),
+        extracurricular: parseInt(document.getElementById("extracurricular").value),
+        backlogs: parseInt(document.getElementById("backlogs").value)
+    };
 
-const previousMarksBar =
-    document.getElementById("previousMarksBar");
+    try {
+        const response = await fetch(
+            "https://student-performance-backend-7u34.onrender.com/predict",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(studentData)
+            }
+        );
 
-const assignmentBar =
-    document.getElementById("assignmentBar");
+        if (!response.ok) {
+            throw new Error("Prediction request failed");
+        }
 
-const internalBar =
-    document.getElementById("internalBar");
+        const data = await response.json();
 
-const sleepBar =
-    document.getElementById("sleepBar");
+        displayResult(data, studentData);
+        savePrediction(data, studentData);
+        updateAnalysis(studentData);
 
+    } catch (error) {
+        console.error("Error:", error);
 
-const studyValue =
-    document.getElementById("studyValue");
+        alert(
+            "Unable to connect to the prediction server. Please try again."
+        );
 
-const attendanceValue =
-    document.getElementById("attendanceValue");
-
-const previousMarksValue =
-    document.getElementById("previousMarksValue");
-
-const assignmentValue =
-    document.getElementById("assignmentValue");
-
-const internalValue =
-    document.getElementById("internalValue");
-
-const sleepValue =
-    document.getElementById("sleepValue");
-
-
-// ==========================================
-// LOAD HISTORY
-// ==========================================
-
-let predictionHistory =
-    JSON.parse(
-        localStorage.getItem(
-            "predictionHistory"
-        )
-    ) || [];
+    } finally {
+        loadingSection.style.display = "none";
+    }
+});
 
 
-// ==========================================
+// ===============================
+// DISPLAY RESULT
+// ===============================
+
+function displayResult(data, studentData) {
+
+    resultSection.style.display = "block";
+
+    predictedMarks.textContent = data.predicted_marks;
+
+    categoryBadge.textContent = data.category;
+
+    // Remove previous category classes
+    categoryBadge.classList.remove(
+        "excellent",
+        "good",
+        "average",
+        "risk"
+    );
+
+    // Category styling
+    if (data.category === "Excellent") {
+
+        categoryBadge.classList.add("excellent");
+
+        resultMessage.textContent =
+            "Excellent performance! Keep maintaining your current study habits.";
+
+    } else if (data.category === "Good") {
+
+        categoryBadge.classList.add("good");
+
+        resultMessage.textContent =
+            "Good performance! With a little more improvement, you can reach the excellent category.";
+
+    } else if (data.category === "Average") {
+
+        categoryBadge.classList.add("average");
+
+        resultMessage.textContent =
+            "Average performance. Improving study time and attendance may help increase your marks.";
+
+    } else {
+
+        categoryBadge.classList.add("risk");
+
+        resultMessage.textContent =
+            "Your predicted performance is at risk. Consider improving your study habits, attendance and academic performance.";
+    }
+
+
+    // Progress bar
+    let score = Math.max(0, Math.min(100, data.predicted_marks));
+
+    scoreProgress.style.width = score + "%";
+
+    resultSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+// ===============================
+// PERFORMANCE ANALYSIS
+// ===============================
+
+function updateAnalysis(studentData) {
+
+    const studyBar = document.getElementById("studyBar");
+    const attendanceBar = document.getElementById("attendanceBar");
+    const previousBar = document.getElementById("previousBar");
+    const assignmentBar = document.getElementById("assignmentBar");
+    const internalBar = document.getElementById("internalBar");
+    const sleepBar = document.getElementById("sleepBar");
+
+
+    if (studyBar) {
+        studyBar.style.width =
+            Math.min((studentData.study_hours / 12) * 100, 100) + "%";
+    }
+
+    if (attendanceBar) {
+        attendanceBar.style.width =
+            Math.min(studentData.attendance, 100) + "%";
+    }
+
+    if (previousBar) {
+        previousBar.style.width =
+            Math.min(studentData.previous_marks, 100) + "%";
+    }
+
+    if (assignmentBar) {
+        assignmentBar.style.width =
+            Math.min(studentData.assignment_score, 100) + "%";
+    }
+
+    if (internalBar) {
+        internalBar.style.width =
+            Math.min(studentData.internal_marks, 100) + "%";
+    }
+
+    if (sleepBar) {
+        sleepBar.style.width =
+            Math.min((studentData.sleep_hours / 12) * 100, 100) + "%";
+    }
+}
+
+
+// ===============================
+// PREDICTION HISTORY
+// ===============================
+
+function savePrediction(data, studentData) {
+
+    const history =
+        JSON.parse(localStorage.getItem("predictionHistory")) || [];
+
+    const prediction = {
+        date: new Date().toLocaleString(),
+        marks: data.predicted_marks,
+        category: data.category,
+        study_hours: studentData.study_hours,
+        attendance: studentData.attendance
+    };
+
+    history.unshift(prediction);
+
+    // Keep only latest 10 predictions
+    const latestHistory = history.slice(0, 10);
+
+    localStorage.setItem(
+        "predictionHistory",
+        JSON.stringify(latestHistory)
+    );
+
+    displayHistory();
+}
+
+
+// ===============================
 // DISPLAY HISTORY
-// ==========================================
+// ===============================
 
 function displayHistory() {
 
+    if (!historyBody) {
+        return;
+    }
+
+    const history =
+        JSON.parse(localStorage.getItem("predictionHistory")) || [];
+
     historyBody.innerHTML = "";
 
+    if (history.length === 0) {
 
-    if (predictionHistory.length === 0) {
-
-        const row =
-            document.createElement("tr");
+        const row = document.createElement("tr");
 
         row.innerHTML = `
             <td colspan="5">
-                No predictions yet
+                No prediction history yet.
             </td>
         `;
 
@@ -110,557 +241,79 @@ function displayHistory() {
     }
 
 
-    predictionHistory.forEach(
-        (prediction, index) => {
+    history.forEach(function (item) {
 
-            const row =
-                document.createElement("tr");
+        const row = document.createElement("tr");
 
+        row.innerHTML = `
+            <td>${item.date}</td>
+            <td>${item.marks}</td>
+            <td>${item.category}</td>
+            <td>${item.study_hours}</td>
+            <td>${item.attendance}%</td>
+        `;
 
-            row.innerHTML = `
-
-                <td>
-                    ${index + 1}
-                </td>
-
-                <td>
-                    ${prediction.study_hours}
-                </td>
-
-                <td>
-                    ${prediction.attendance}%
-                </td>
-
-                <td>
-                    <strong>
-                        ${prediction.predicted_marks}
-                    </strong>
-                </td>
-
-                <td>
-                    <span class="history-category">
-                        ${prediction.category}
-                    </span>
-                </td>
-
-            `;
-
-
-            historyBody.appendChild(row);
-
-        }
-    );
+        historyBody.appendChild(row);
+    });
 }
 
 
-// Display history
+// ===============================
+// CLEAR HISTORY
+// ===============================
 
-displayHistory();
+if (clearHistoryBtn) {
 
+    clearHistoryBtn.addEventListener("click", function () {
 
-// ==========================================
-// UPDATE PERFORMANCE ANALYSIS
-// ==========================================
+        localStorage.removeItem("predictionHistory");
 
-function updateAnalysis(studentData) {
-
-    // Show analysis section
-
-    analysisSection.classList.remove(
-        "hidden"
-    );
-
-
-    // ==========================================
-    // STUDY HOURS
-    // Maximum = 12 hours
-    // ==========================================
-
-    const studyPercentage =
-        Math.min(
-            (studentData.study_hours / 12) * 100,
-            100
-        );
-
-
-    studyBar.style.width =
-        studyPercentage + "%";
-
-
-    studyValue.textContent =
-        studentData.study_hours + " hrs";
-
-
-    // ==========================================
-    // ATTENDANCE
-    // Maximum = 100%
-    // ==========================================
-
-    attendanceBar.style.width =
-        Math.min(
-            studentData.attendance,
-            100
-        ) + "%";
-
-
-    attendanceValue.textContent =
-        studentData.attendance + "%";
-
-
-    // ==========================================
-    // PREVIOUS MARKS
-    // Maximum = 100
-    // ==========================================
-
-    previousMarksBar.style.width =
-        Math.min(
-            studentData.previous_marks,
-            100
-        ) + "%";
-
-
-    previousMarksValue.textContent =
-        studentData.previous_marks;
-
-
-    // ==========================================
-    // ASSIGNMENT
-    // Maximum = 100
-    // ==========================================
-
-    assignmentBar.style.width =
-        Math.min(
-            studentData.assignment_score,
-            100
-        ) + "%";
-
-
-    assignmentValue.textContent =
-        studentData.assignment_score;
-
-
-    // ==========================================
-    // INTERNAL MARKS
-    // Maximum = 100
-    // ==========================================
-
-    internalBar.style.width =
-        Math.min(
-            studentData.internal_marks,
-            100
-        ) + "%";
-
-
-    internalValue.textContent =
-        studentData.internal_marks;
-
-
-    // ==========================================
-    // SLEEP HOURS
-    // Maximum = 12 hours
-    // ==========================================
-
-    const sleepPercentage =
-        Math.min(
-            (studentData.sleep_hours / 12) * 100,
-            100
-        );
-
-
-    sleepBar.style.width =
-        sleepPercentage + "%";
-
-
-    sleepValue.textContent =
-        studentData.sleep_hours + " hrs";
-
+        displayHistory();
+    });
 }
 
 
-// ==========================================
-// PREDICTION
-// ==========================================
-
-form.addEventListener(
-    "submit",
-    async function (event) {
-
-        event.preventDefault();
-
-
-        // Show loading
-
-        loading.classList.remove(
-            "hidden"
-        );
-
-
-        // Hide previous result
-
-        result.classList.add(
-            "hidden"
-        );
-
-
-        // ==========================================
-        // COLLECT INPUT
-        // ==========================================
-
-        const studentData = {
-
-            study_hours: Number(
-                document.getElementById(
-                    "study_hours"
-                ).value
-            ),
-
-            attendance: Number(
-                document.getElementById(
-                    "attendance"
-                ).value
-            ),
-
-            previous_marks: Number(
-                document.getElementById(
-                    "previous_marks"
-                ).value
-            ),
-
-            assignment_score: Number(
-                document.getElementById(
-                    "assignment_score"
-                ).value
-            ),
-
-            internal_marks: Number(
-                document.getElementById(
-                    "internal_marks"
-                ).value
-            ),
-
-            sleep_hours: Number(
-                document.getElementById(
-                    "sleep_hours"
-                ).value
-            ),
-
-            internet_hours: Number(
-                document.getElementById(
-                    "internet_hours"
-                ).value
-            ),
-
-            extracurricular: Number(
-                document.getElementById(
-                    "extracurricular"
-                ).value
-            ),
-
-            backlogs: Number(
-                document.getElementById(
-                    "backlogs"
-                ).value
-            )
-
-        };
-
-
-        // ==========================================
-        // SEND DATA TO FASTAPI
-        // ==========================================
-
-        try {
-
-            const response =
-                await fetch(
-                    "http://127.0.0.1:8000/predict",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify(
-                                studentData
-                            )
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Prediction request failed"
-                );
-
-            }
-
-
-            // ==========================================
-            // GET RESPONSE
-            // ==========================================
-
-            const data =
-                await response.json();
-
-
-            const marks =
-                Number(
-                    data.predicted_marks
-                );
-
-
-            // ==========================================
-            // DISPLAY PREDICTION
-            // ==========================================
-
-            predictedMarks.textContent =
-                marks.toFixed(2);
-
-
-            categoryBadge.textContent =
-                data.category;
-
-
-            categoryBadge.className =
-                "category-badge";
-
-
-            // ==========================================
-            // CATEGORY
-            // ==========================================
-
-            if (
-                data.category ===
-                "Excellent"
-            ) {
-
-                categoryBadge.classList.add(
-                    "excellent"
-                );
-
-                scoreMessage.textContent =
-                    "🌟 Excellent predicted performance!";
-
-            }
-
-            else if (
-                data.category ===
-                "Good"
-            ) {
-
-                categoryBadge.classList.add(
-                    "good"
-                );
-
-                scoreMessage.textContent =
-                    "👍 Good predicted performance!";
-
-            }
-
-            else if (
-                data.category ===
-                "Average"
-            ) {
-
-                categoryBadge.classList.add(
-                    "average"
-                );
-
-                scoreMessage.textContent =
-                    "📚 There is room for improvement.";
-
-            }
-
-            else {
-
-                categoryBadge.classList.add(
-                    "risk"
-                );
-
-                scoreMessage.textContent =
-                    "⚠️ Consider improving academic habits.";
-
-            }
-
-
-            // ==========================================
-            // PROGRESS BAR
-            // ==========================================
-
-            progressBar.style.width =
-                Math.min(
-                    Math.max(marks, 0),
-                    100
-                ) + "%";
-
-
-            // ==========================================
-            // PERFORMANCE ANALYSIS
-            // ==========================================
-
-            updateAnalysis(
-                studentData
-            );
-
-
-            // ==========================================
-            // SAVE HISTORY
-            // ==========================================
-
-            const historyItem = {
-
-                study_hours:
-                    studentData.study_hours,
-
-                attendance:
-                    studentData.attendance,
-
-                predicted_marks:
-                    marks.toFixed(2),
-
-                category:
-                    data.category
-
-            };
-
-
-            predictionHistory.unshift(
-                historyItem
-            );
-
-
-            // Keep latest 10
-
-            predictionHistory =
-                predictionHistory.slice(
-                    0,
-                    10
-                );
-
-
-            localStorage.setItem(
-                "predictionHistory",
-                JSON.stringify(
-                    predictionHistory
-                )
-            );
-
-
-            // Update history table
-
-            displayHistory();
-
-
-            // Show result
-
-            result.classList.remove(
-                "hidden"
-            );
-
-        }
-
-
-        catch (error) {
-
-            console.error(error);
-
-            alert(
-                "Could not connect to the prediction server. Make sure FastAPI is running."
-            );
-
-        }
-
-
-        finally {
-
-            loading.classList.add(
-                "hidden"
-            );
-
-        }
-
-    }
-);
-
-
-// ==========================================
+// ===============================
 // RESET FORM
-// ==========================================
+// ===============================
 
-resetButton.addEventListener(
-    "click",
-    function () {
+if (resetBtn) {
+
+    resetBtn.addEventListener("click", function () {
 
         form.reset();
 
+        resultSection.style.display = "none";
 
-        result.classList.add(
-            "hidden"
-        );
+        loadingSection.style.display = "none";
 
+        scoreProgress.style.width = "0%";
 
-        analysisSection.classList.add(
-            "hidden"
-        );
+        // Reset analysis bars
+        const bars = [
+            "studyBar",
+            "attendanceBar",
+            "previousBar",
+            "assignmentBar",
+            "internalBar",
+            "sleepBar"
+        ];
 
+        bars.forEach(function (barId) {
 
-        predictedMarks.textContent =
-            "0";
+            const bar = document.getElementById(barId);
 
-
-        categoryBadge.textContent =
-            "-";
-
-
-        categoryBadge.className =
-            "category-badge";
-
-
-        progressBar.style.width =
-            "0%";
-
-
-        scoreMessage.textContent =
-            "Your predicted performance is shown above.";
+            if (bar) {
+                bar.style.width = "0%";
+            }
+        });
+    });
+}
 
 
-        studyBar.style.width = "0%";
+// ===============================
+// LOAD HISTORY WHEN PAGE OPENS
+// ===============================
 
-        attendanceBar.style.width = "0%";
+displayHistory();
 
-        previousMarksBar.style.width = "0%";
-
-        assignmentBar.style.width = "0%";
-
-        internalBar.style.width = "0%";
-
-        sleepBar.style.width = "0%";
-
-    }
-);
-
-
-// ==========================================
-// CLEAR HISTORY
-// ==========================================
-
-clearHistoryButton.addEventListener(
-    "click",
-    function () {
-
-        predictionHistory = [];
-
-
-        localStorage.removeItem(
-            "predictionHistory"
-        );
-
-
-        displayHistory();
-
-    }
-);
